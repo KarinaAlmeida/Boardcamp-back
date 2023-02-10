@@ -10,6 +10,6 @@ const customerRouter = express.Router();
 customerRouter.get('/customers', getCustomers);
 customerRouter.get('/customers/:id', getCustomersId);
 customerRouter.post('/customers', validateCustomer(cadastraCliente) ,newCustomer);
-customerRouter.put('/customers/:id', reloadCustomer);
+customerRouter.put('/customers/:id', validateCustomer(cadastraCliente), reloadCustomer);
 
 export default customerRouter;
