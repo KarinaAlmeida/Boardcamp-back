@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 // import {db} from "./database/database.connection.js";
 import gameRouter from "./routers/games.router.js";
 import customerRouter from "./routers/customers.router.js";
+import rentalRouter from "./routers/rentals.router.js";
+
 
 dotenv.config();
 
@@ -18,4 +20,5 @@ server.listen(PORT, () => console.log(`Rodando na porta: ${PORT}`));
 
 server.use(gameRouter)
 server.use(customerRouter)
+server.use(rentalRouter)
 
