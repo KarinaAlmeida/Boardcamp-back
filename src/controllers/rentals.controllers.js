@@ -1,4 +1,6 @@
 import {db} from "../database/database.connection.js";
+import dayjs from "dayjs";
+
 
 async function getRentals (req, res) {
     try {
@@ -41,6 +43,58 @@ async function getRentals (req, res) {
 }
 
 async function novoAluguel (req,res){
+const { customerId, gameId, daysRented } = req.body;
+let time = dayjs().format("YYYY-MM-DD")
+
+try {
+    if(daysRented <=0) return res.sendStatus(400)
+
+    const naoExiste = await db.query('SELECT * FROM games WHERE id = $1', [
+        gameId,
+      ]);
+      if (naoExiste.rowCount !== 1) {
+        return res.status(400).send("Opa! Esse jogo não existe! ");
+      }
+
+      const clienteExiste = await db.query(
+        'SELECT * FROM customers WHERE id = $1',
+        [customerId]
+      );
+      if (clienteExiste.rowCount !== 1) {
+        return res.status(400).send("Ei! Esse cliente não existe!");
+      }
+
+      const stock = db.query(`
+      SELECT "stockTotal" FROM games WHERE id = $1
+      
+      `, [gameId]) 
+      if (stock.rows[0].stockTotal <= 0) {
+        return res.status(400).send("Poxa, estamos sem estoque!")
+      }
+
+
+      const price= await db.query (
+        `SELECT "pricePerDay" FROM games WHERE id = $1`, [gameId]
+      )
+
+        
+
+      const rental = await db.query(
+        `
+      INSERT INTO rentals ("customerId", "gameId", "daysRented", "rentDate", "originalPrice")
+      VALUES ($1, $2, $3, $4 , $5);
+      `,
+        [customerId, gameId, daysRented, time, daysRented*price.rows[0].pricePerDay ]
+        
+      );
+  
+      if (rental.rowCount === 1) {
+        res.status(201).send("Aluguel cadastrado!");
+      }
+}catch (error) {
+        res.status(500).send(error.message);
+    }
+
 
 }
 
