@@ -72,7 +72,11 @@ try {
       SELECT "stockTotal" FROM games WHERE id = $1
       
       `, [gameId]) 
-      if (stock.rows[0].stockTotal > alugueis.rowCount) {
+
+      console.log(stock.rows[0].stockTotal)
+      console.log(alugueis.rowCount)
+      
+      if (stock.rows[0].stockTotal <= alugueis.rowCount) {
         return res.status(400).send("Poxa, estamos sem estoque!")
       }
  
@@ -96,7 +100,7 @@ try {
         res.status(201).send("Aluguel cadastrado!");
       }
 
-      
+
 }catch (error) {
         res.status(500).send(error.message);
     }
