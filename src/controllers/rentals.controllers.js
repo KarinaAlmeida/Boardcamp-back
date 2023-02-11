@@ -64,14 +64,18 @@ try {
         return res.status(400).send("Ei! Esse cliente não existe!");
       }
 
-      const stock = db.query(`
+      const alugueis = await db.query(`
+      SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" IS NULL;
+      `, [gameId])
+
+      const stock = await db.query(`
       SELECT "stockTotal" FROM games WHERE id = $1
       
       `, [gameId]) 
-      if (stock.rows[0].stockTotal <= 0) {
+      if (stock.rows[0].stockTotal > alugueis.rowCount) {
         return res.status(400).send("Poxa, estamos sem estoque!")
       }
-
+ 
 
       const price= await db.query (
         `SELECT "pricePerDay" FROM games WHERE id = $1`, [gameId]
