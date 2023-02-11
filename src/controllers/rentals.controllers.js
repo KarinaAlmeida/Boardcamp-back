@@ -95,6 +95,8 @@ try {
       if (rental.rowCount === 1) {
         res.status(201).send("Aluguel cadastrado!");
       }
+
+      
 }catch (error) {
         res.status(500).send(error.message);
     }
