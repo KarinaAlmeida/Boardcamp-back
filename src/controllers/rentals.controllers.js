@@ -107,11 +107,91 @@ try {
 }
 
 async function finalizarAluguel (req,res) {
+    const idParams = Number(req.params.id)
+    if (!idParams || idParams < 1) {
+     return res.sendStatus(400);
+   }
+
+try{
+
+    const returnDate= dayjs().format("YYYY-MM-DD")
+
+    const idAluguel= await db.query(`SELECT * FROM rentals WHERE id= $1;`, [idParams])
+
+    if (idAluguel.rowCount===0) return res.status(404).send("Id de aluguel não encontrado!")
+
+    const alugueis = await db.query(`
+      SELECT * FROM rentals WHERE "id" = $1 AND "returnDate" IS NULL;
+      `, [idParams])
+
+      if (alugueis.rowCount ===0) return res.status(404).send("Esse aluguel já foi finalizado!");
+
+
+    const {rows: rentals} = await db.query (`
+    SELECT "rentDate", "daysRented", "originalPrice" FROM rentals WHERE id=$1;`, [idParams]
+)
+
+
+    const {rentDate, daysRented, originalPrice} = rentals[0];
+
+    const diasPassados = dayjs(returnDate).diff(rentDate, "days");
+    const pricePerDay = originalPrice / daysRented;
+    
+    const atrasado = (diasPassados <= daysRented) ? 0 : (diasPassados - daysRented) * pricePerDay;
+
+    await db.query(`
+    UPDATE
+        rentals
+    SET "returnDate" = $1, "delayFee" = $2
+    WHERE id = $3;
+`, [returnDate, atrasado, idParams]);
+
+return res.status(200).send("Aluguel finalizado com sucesso!");
+
+
+}catch (error) {
+    res.status(500).send(error.message);
+}
 
 }
 
 async function apagarAluguel (req,res) {
+    const idParams = Number(req.params.id)
+    if (!idParams || idParams < 1) {
+     return res.sendStatus(400);
+   }
+
+   try {
+   const idAluguel= await db.query(`SELECT * FROM rentals WHERE id= $1;`, [idParams])
+
+   if (idAluguel.rowCount===0) return res.status(404).send("Id de aluguel não encontrado!")
+
+   const alugueis = await db.query(`
+      SELECT * FROM rentals WHERE "id" = $1 AND "returnDate" IS NULL;
+      `, [idParams])
+
+      if (alugueis.rowCount ===0) return res.status(404).send("Esse aluguel já foi finalizado!");
+
+
+    await db.query(`
+                DELETE FROM
+                    rentals
+                WHERE 
+                    id = $1;
+            `, [id]);
+            
+
+        return res.status(200).send("Alugue deletado!");
+   }catch (error) {
+    res.status(500).send(error.message);
+}
 
 }
 
 export {getRentals, novoAluguel, apagarAluguel, finalizarAluguel}
+
+
+
+
+
+
