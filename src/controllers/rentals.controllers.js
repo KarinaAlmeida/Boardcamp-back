@@ -124,7 +124,7 @@ try{
       SELECT * FROM rentals WHERE "id" = $1 AND "returnDate" IS NULL;
       `, [idParams])
 
-      if (alugueis.rowCount ===0) return res.status(404).send("Esse aluguel já foi finalizado!");
+      if (alugueis.rowCount ===0) return res.status(400).send("Esse aluguel já foi finalizado!");
 
 
     const {rows: rentals} = await db.query (`
