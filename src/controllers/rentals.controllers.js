@@ -178,7 +178,7 @@ async function apagarAluguel (req,res) {
                     rentals
                 WHERE 
                     id = $1;
-            `, [id]);
+            `, [idParams]);
             
 
         return res.status(200).send("Aluguel deletado!");
@@ -189,6 +189,7 @@ async function apagarAluguel (req,res) {
 }
 
 export {getRentals, novoAluguel, apagarAluguel, finalizarAluguel}
+
 
 
 
