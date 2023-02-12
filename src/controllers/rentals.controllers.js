@@ -73,8 +73,6 @@ try {
       
       `, [gameId]) 
 
-      console.log(stock.rows[0].stockTotal)
-      console.log(alugueis.rowCount)
       
       if (stock.rows[0].stockTotal <= alugueis.rowCount) {
         return res.status(400).send("Poxa, estamos sem estoque!")
