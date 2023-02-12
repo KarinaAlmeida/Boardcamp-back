@@ -170,7 +170,7 @@ async function apagarAluguel (req,res) {
       SELECT * FROM rentals WHERE "id" = $1 AND "returnDate" IS NULL;
       `, [idParams])
 
-      if (alugueis.rowCount ===0) return res.status(404).send("Esse aluguel já foi finalizado!");
+      if (alugueis.rowCount >0 ) return res.status(400).send("Esse aluguel já foi finalizado!");
 
 
     await db.query(`
@@ -181,7 +181,7 @@ async function apagarAluguel (req,res) {
             `, [id]);
             
 
-        return res.status(200).send("Alugue deletado!");
+        return res.status(200).send("Aluguel deletado!");
    }catch (error) {
     res.status(500).send(error.message);
 }
